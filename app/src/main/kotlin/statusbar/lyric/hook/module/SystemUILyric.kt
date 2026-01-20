@@ -235,8 +235,10 @@ class SystemUILyric : BaseHook() {
                         val view = (hookParam.thisObject as View)
                         if (view.isTargetView()) {
                             clockView = view as TextView
-                            targetView = (clockView.parent as LinearLayout).apply {
-                                gravity = Gravity.CENTER
+                            targetView = (clockView.parent as ViewGroup).apply {
+                                if (this is LinearLayout) {
+                                    gravity = Gravity.CENTER
+                                }
                             }
                             canLoad = false
                             lyricInit()
@@ -891,7 +893,17 @@ class SystemUILyric : BaseHook() {
         val textWidth = textView.paint.measureText(lyric).toInt()
         theoreticalWidth = textWidth
         return if (config.lyricWidth == 0) {
-            min(textView.paint.measureText(lyric).toInt(), targetView.width - config.lyricStartMargins - config.lyricEndMargins)
+            // 获取可用宽度：优先使用targetView宽度，如果太小则使用屏幕宽度的50%
+            val screenWidth = if (context.isLandscape()) displayHeight else displayWidth
+            val availableWidth = if (targetView.width > screenWidth / 5) {
+                targetView.width
+            } else {
+                // targetView宽度太小，使用屏幕宽度的25%
+                screenWidth / 4
+            }
+            val maxWidth = availableWidth - config.lyricStartMargins - config.lyricEndMargins
+            "Available width: $availableWidth, Max width: $maxWidth, Text width: $textWidth".log()
+            min(textWidth, maxWidth)
         } else {
             if (config.fixedLyricWidth) {
                 scaleWidth()

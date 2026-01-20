@@ -32,6 +32,8 @@ import android.graphics.Color
 import android.os.Build
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.github.kyuubiran.ezxhelper.EzXHelper.moduleRes
@@ -104,7 +106,7 @@ class SystemUITest : BaseHook() {
                     text.isTimeSame {
                         if (className.filterClassName()) {
                             view.filterView {
-                                val parentView = (view.parent as LinearLayout)
+                                val parentView = (view.parent as FrameLayout)
                                 val newData = Data(
                                     className,
                                     view.id,
@@ -185,8 +187,8 @@ class SystemUITest : BaseHook() {
 
     @SuppressLint("DiscouragedApi")
     private fun View.filterView(function: () -> Unit) {
-        if (this.parent is LinearLayout) {
-            val parentView = (this.parent as LinearLayout)
+        if (this.parent is ViewGroup) {
+            val parentView = (this.parent as ViewGroup)
             val id = context.resources.getIdentifier("clock_container", "id", context.packageName)
             if (parentView.id != id) {
                 function()
@@ -237,12 +239,12 @@ class SystemUITest : BaseHook() {
                             ) {
                                 if (lastViewId != textview.id) {
                                     if (this@SystemUITest::lastView.isInitialized) {
-                                        (lastView.parent as LinearLayout).removeView(testTextView)
+                                        (lastView.parent as ViewGroup).removeView(testTextView)
                                         lastView.showView()
                                     }
                                     textview.hideView()
-                                    val parentLinearLayout = textview.parent as LinearLayout
-                                    parentLinearLayout.addView(testTextView, 0)
+                                    val parentViewGroup = textview.parent as ViewGroup
+                                    parentViewGroup.addView(testTextView, 0)
                                     lastViewId = textview.id
                                     lastView = textview
                                 }

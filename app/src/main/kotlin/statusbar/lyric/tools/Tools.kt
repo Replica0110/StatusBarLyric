@@ -32,6 +32,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -132,8 +133,8 @@ object Tools {
             if (this::class.java.name == textViewClassName) {
                 if (this.id == textViewId) {
                     if (this.textSize == textSize) {
-                        if (this.parent is LinearLayout) {
-                            val parentView = (this.parent as LinearLayout)
+                        if (this.parent is ViewGroup) {
+                            val parentView = (this.parent as ViewGroup)
                             if (parentView::class.java.name == parentViewClassName) {
                                 if (parentViewId == parentView.id) {
                                     if (index == XposedOwnSP.config.index) {
